@@ -1,7 +1,7 @@
 # Pro business data assistant
 
 Date: 2026-10-17
-Status: Proposed written specification; the user approved the conversational design.
+Status: Approved by the user on 2026-10-17; implementation plan pending review.
 
 ## Purpose and agreed scope
 
