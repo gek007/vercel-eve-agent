@@ -1,6 +1,18 @@
 {
   "billing": {
     "user_enabled": true,
-    "organization_enabled": false
+    "organization_enabled": false,
+    "plans": {
+      "pro": {
+        "name": "Pro",
+        "description": "Access the business data assistant, dashboard, customers, orders, and revenue insights.",
+        "payer_type": "user",
+        "amount": 2000,
+        "currency": "usd",
+        "is_recurring": true,
+        "publicly_visible": true,
+        "free_trial_enabled": false
+      }
+    }
   }
 }

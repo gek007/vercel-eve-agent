@@ -49,7 +49,8 @@ unrelated integrations are outside this application's scope.
 ## Identity, billing, and ownership
 
 The initial subscription model is B2C: the individual user subscribes. The paid
-plan slug is `pro`. Plan price is configuration in Clerk and is not hard-coded
+plan slug is `pro`, priced at USD 20/month as confirmed by the user. Plan price is
+configuration in Clerk and is not hard-coded
 into application authorization. Development uses Clerk's test billing flow;
 production payment setup is separate from local implementation.
 
