@@ -140,7 +140,9 @@ configuration. Never expose provider secret keys to the browser or model.
 
 The Vercel CLI previously reported an invalid token. Reauthentication through
 `vercel login` is required before deployment. Clerk CLI is authenticated but no
-application is linked. Convex deployment authentication/linking remains to be
+application was linked at that time. Clerk B2C development billing has since been
+enabled on `vercel-eve-agent`; see `docs/clerk-billing-setup.md` for verified state.
+Convex deployment authentication/linking remains to be
 verified. These setup facts do not constitute verified deployment readiness.
 
 ## Acceptance and verification

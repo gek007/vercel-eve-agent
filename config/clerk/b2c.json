@@ -1,0 +1,6 @@
+{
+  "billing": {
+    "user_enabled": true,
+    "organization_enabled": false
+  }
+}
