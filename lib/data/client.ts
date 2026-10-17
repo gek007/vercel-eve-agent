@@ -10,7 +10,7 @@ import {
   type BusinessResult,
   type Conversation,
 } from "./contracts";
-async function gateway<T>(
+export async function gateway<T>(
   caller: ProCaller,
   operation: GatewayEnvelope["operation"],
   input: unknown,
@@ -36,13 +36,20 @@ async function gateway<T>(
     cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok)
+  if (!response.ok) {
+    const error = (await response.json().catch(() => ({}))) as {
+      error?: string;
+    };
+    const status = [400, 403, 404, 409].includes(response.status)
+      ? response.status
+      : 503;
     throw new AccessError(
-      response.status === 403 ? 403 : 503,
-      response.status === 403
-        ? "This conversation is not available to your account."
-        : "The database could not complete this request.",
+      status,
+      status === 503
+        ? "The database could not complete this request."
+        : (error.error ?? "This request is not available to your account."),
     );
+  }
   return response.json() as Promise<T>;
 }
 export function queryBusiness(

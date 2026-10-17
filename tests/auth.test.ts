@@ -59,8 +59,12 @@ it("trusts only configured and platform-provided deployment origins", () => {
     "https://preview.vercel.app",
   ]);
 });
-it('allows a verified free shopper without granting Pro', async () => {
-  const { enforceAuthenticated } = await import('../lib/auth/policy');
-  expect(enforceAuthenticated({userId:'free',has:()=>false},'issuer')).toEqual({userId:'free',issuer:'issuer'});
-  expect(()=>enforceAuthenticated(null,'issuer')).toThrowError(expect.objectContaining({status:401}));
+it("allows a verified free shopper without granting Pro", async () => {
+  const { enforceAuthenticated } = await import("../lib/auth/policy");
+  expect(
+    enforceAuthenticated({ userId: "free", has: () => false }, "issuer"),
+  ).toEqual({ userId: "free", issuer: "issuer" });
+  expect(() => enforceAuthenticated(null, "issuer")).toThrowError(
+    expect.objectContaining({ status: 401 }),
+  );
 });

@@ -1,42 +1,62 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 import {
-  ChartNoAxesCombined,
+  CircuitBoard,
   LayoutDashboard,
-  Users,
-  ShoppingBag,
-  Sparkles,
+  Boxes,
+  Package,
+  ShoppingBasket,
+  Bot,
   CreditCard,
-  ArrowUpRight,
+  ChevronRight,
 } from "lucide-react";
 const navigation = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/chat", label: "Ask Ledger", icon: Sparkles },
-  { href: "/customers", label: "Customers", icon: Users },
-  { href: "/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/shop", label: "Shop", icon: Boxes },
+  { href: "/orders", label: "Orders", icon: Package },
+  { href: "/cart", label: "Cart", icon: ShoppingBasket },
+  { href: "/agent", label: "Agent", icon: Bot },
+  { href: "/billing", label: "Billing", icon: CreditCard },
 ];
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const path = usePathname();
+  const path = usePathname(),
+    { has } = useAuth();
+  const isPro = has?.({ plan: "pro" }) ?? false;
+  const [quantity, setQuantity] = useState(0);
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      void fetch("/api/shop?operation=cart", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((r) => {
+          if (active && r) setQuantity(r.quantity);
+        })
+        .catch(() => {});
+    };
+    refresh();
+    window.addEventListener("shop:cart", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("shop:cart", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [path]);
   return (
     <div className="workspace">
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <aside className="sidebar">
-        <Link href="/" className="brand">
-          <ChartNoAxesCombined aria-hidden="true" size={25} />
-          Ledger
-          <span className="brand-dot" />
+      <aside className="sidebar shop-sidebar">
+        <Link href="/" className="brand shop-brand">
+          <CircuitBoard aria-hidden="true" />
+          <span>
+            Circuit &amp; Co.<small>Helpful tech, thoughtfully picked.</small>
+          </span>
         </Link>
-        <div className="workspace-label">
-          <span className="workspace-avatar">L</span>
-          <div>
-            My workspace<small>Business intelligence</small>
-          </div>
-          <span className="pro-tag">Pro</span>
-        </div>
         <nav aria-label="Workspace navigation">
           {navigation.map(({ href, label, icon: Icon }) => (
             <Link
@@ -47,22 +67,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Icon size={19} aria-hidden="true" />
               {label}
-              {href === "/chat" && <span className="new-tag">AI</span>}
+              {href === "/cart" && quantity > 0 ? (
+                <span className="cart-badge" aria-label={`${quantity} items`}>
+                  {quantity}
+                </span>
+              ) : path.startsWith(href) ? (
+                <ChevronRight className="nav-chevron" size={16} />
+              ) : null}
             </Link>
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="dataset-note">
-            <span className="status-dot" />
-            <span>
-              Demo workspace<small>Synthetic data, real insights</small>
+          <div className="scout-plan">
+            <span className="pro-tag">
+              {isPro ? "Pro member" : "Your companion"}
             </span>
+            <p>
+              {isPro
+                ? "Scout is ready to help."
+                : "Find a little extra help with Scout."}
+            </p>
+            <Link href="/billing">
+              {isPro ? "Manage plan" : "Explore Pro"}
+              <ChevronRight size={15} />
+            </Link>
           </div>
-          <Link href="/pricing" className="nav-link">
-            <CreditCard size={19} aria-hidden="true" />
-            Manage subscription
-            <ArrowUpRight size={15} />
-          </Link>
           <div className="account-row">
             <UserButton showName />
             <span className="subtle-badge">Personal</span>
@@ -71,14 +100,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="workspace-main">
         <header className="workspace-topbar">
-          <span>
-            {navigation.find((n) => path.startsWith(n.href))?.label ??
-              "Workspace"}
+          <span className="shop-environment">
+            <span className="status-dot" />
+            Development shop · simulated orders
           </span>
           <div>
-            <span className="demo-badge">Sample business data</span>
-            <span className="topbar-divider" />
-            USD <span className="muted">/ UTC</span><span className="mobile-account"><UserButton /></span>
+            <span className="member-label">
+              {isPro ? "Pro member" : "Personal account"}
+            </span>
+            <UserButton />
           </div>
         </header>
         <main id="main-content" className="content">

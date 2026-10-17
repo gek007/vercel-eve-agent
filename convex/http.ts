@@ -1,6 +1,8 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { ConvexError } from "convex/values";
+import { shopReadSchema, shopWriteSchema } from "../lib/shop/contracts";
 import { z } from "zod";
 import { verifyEnvelope } from "../lib/security/gateway-signature";
 import { businessSchema } from "../lib/data/contracts";
@@ -25,6 +27,20 @@ http.route({
     const { ownerId, operation, input } = envelope;
     try {
       switch (operation) {
+        case "shopping.read":
+          return Response.json(
+            await ctx.runQuery(internal.shopping.read, {
+              ownerId,
+              input: shopReadSchema.parse(input),
+            }),
+          );
+        case "shopping.write":
+          return Response.json(
+            await ctx.runMutation(internal.shopping.write, {
+              ownerId,
+              input: shopWriteSchema.parse(input),
+            }),
+          );
         case "business":
           return Response.json(
             await ctx.runQuery(internal.business.read, {
@@ -58,6 +74,26 @@ http.route({
           );
       }
     } catch (error) {
+      if (
+        error instanceof ConvexError &&
+        typeof error.data === "object" &&
+        error.data &&
+        "code" in error.data &&
+        "message" in error.data
+      ) {
+        const data = error.data as { code: string; message: string };
+        return Response.json(
+          { error: data.message },
+          {
+            status:
+              data.code === "NOT_FOUND"
+                ? 404
+                : data.code === "CART_CHANGED"
+                  ? 409
+                  : 400,
+          },
+        );
+      }
       if (error instanceof z.ZodError)
         return Response.json({ error: "Invalid input" }, { status: 400 });
       return Response.json(

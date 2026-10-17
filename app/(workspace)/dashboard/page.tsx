@@ -1,144 +1,155 @@
 import Link from "next/link";
 import {
-  Sparkles,
-  ArrowUpRight,
-  ShoppingBag,
-  Users,
-  ChartNoAxesCombined,
+  ShoppingBasket,
+  Package,
   Wallet,
-  CalendarDays,
+  Bot,
+  ArrowUpRight,
+  ArrowRight,
 } from "lucide-react";
-import { requireProPage } from "@/lib/auth/page";
-import { queryBusiness } from "@/lib/data/client";
-import { RevenueChart } from "@/components/revenue-chart";
-import { OrdersTable } from "@/components/business-tables";
+import { requireAuthenticatedPage } from "@/lib/auth/page";
+import { queryShop } from "@/lib/shop/client";
+import { money } from "@/lib/format";
 import { AccessState } from "@/components/access-state";
-import { money, number } from "@/lib/format";
 export default async function Dashboard() {
-  const caller = await requireProPage();
-  let result;
+  const caller = await requireAuthenticatedPage();
+  let data;
   try {
-    result = await queryBusiness(caller, {
-      operation: "revenue",
-      groupBy: "month",
-    });
+    data = await queryShop(caller, { operation: "overview" });
   } catch {
     return (
-      <AccessState message="We couldn’t reach your business data. Try again in a moment." />
+      <AccessState message="Your account overview could not be loaded. Please try again." />
     );
   }
-  if (result.kind !== "revenue") return null;
-  if (!result.seeded)
-    return (
-      <AccessState
-        title="Your workspace is ready for data"
-        message="Your private demo dataset hasn’t been prepared yet. Ask your workspace administrator to seed your account."
-      />
-    );
-  const stats = [
-    {
-      label: "Completed revenue",
-      value: money(result.revenueCents),
-      detail: "Completed orders only",
-      icon: Wallet,
-    },
-    {
-      label: "Total orders",
-      value: number(result.totalOrders),
-      detail: `${number(result.completedOrders)} completed`,
-      icon: ShoppingBag,
-    },
-    {
-      label: "Customers",
-      value: number(result.customers),
-      detail: "Across 5 regions",
-      icon: Users,
-    },
-    {
-      label: "Average order value",
-      value: money(result.averageOrderCents),
-      detail: "Per completed order",
-      icon: ChartNoAxesCombined,
-    },
-  ];
+  if (data.kind !== "overview") return null;
   return (
     <>
       <div className="page-heading">
         <div>
-          <h1>Your business at a glance</h1>
-          <p>A little perspective on the numbers that matter.</p>
+          <span className="shop-kicker">A little look around</span>
+          <h1>Your everyday, upgraded.</h1>
+          <p>Your finds, your orders, and a little help from Scout.</p>
         </div>
-        <span className="date-chip">
-          <CalendarDays size={16} aria-hidden="true" />
-          Jan 1 – Sep 30, 2026
-        </span>
+        <Link className="button" href="/shop">
+          Explore the shop <ArrowRight size={16} />
+        </Link>
       </div>
-      <div className="stats-grid">
-        {stats.map(({ label, value, detail, icon: Icon }) => (
-          <section className="stat" key={label}>
+      <div className="shopping-stats">
+        {[
+          {
+            label: "In your cart",
+            value: String(data.cartQuantity),
+            note: "Ready for a closer look",
+            icon: ShoppingBasket,
+            href: "/cart",
+          },
+          {
+            label: "Your orders",
+            value: String(data.orderCount),
+            note: "All your demo purchases",
+            icon: Package,
+            href: "/orders",
+          },
+          {
+            label: "Completed purchases",
+            value: money(data.completedSpendCents),
+            note: "Simulated spending · USD",
+            icon: Wallet,
+            href: "/orders",
+          },
+        ].map((s) => (
+          <Link href={s.href} key={s.label} className="stat">
             <div className="stat-heading">
-              {label}
-              <Icon size={17} aria-hidden="true" />
+              {s.label}
+              <s.icon size={20} />
             </div>
-            <div className="stat-value">{value}</div>
-            <p>{detail}</p>
-          </section>
+            <div className="stat-value">{s.value}</div>
+            <p>{s.note}</p>
+          </Link>
         ))}
       </div>
       <div className="dashboard-grid">
-        <section className="panel revenue-panel">
+        <section className="panel">
           <div className="panel-heading">
             <div>
-              <h2>Revenue over time</h2>
-              <p>Completed orders, in USD</p>
+              <h2>Your recent orders</h2>
+              <p>Thoughtfully picked, recently purchased.</p>
             </div>
-            <span className="legend">
-              <span />
-              Revenue
-            </span>
+            <Link href="/orders" className="text-link">
+              All orders <ArrowUpRight size={14} />
+            </Link>
           </div>
-          <RevenueChart groups={result.groups} />
+          {!data.recentOrders.length ? (
+            <div className="no-rows">
+              No orders yet. Your first find is waiting in the shop.
+            </div>
+          ) : (
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Status</th>
+                    <th className="numeric">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.recentOrders.map((o) => (
+                    <tr key={o.id}>
+                      <td>
+                        <Link
+                          className="order-reference"
+                          href={`/orders?order=${encodeURIComponent(o.id)}`}
+                        >
+                          {o.reference}
+                        </Link>
+                        <small>Simulated order</small>
+                      </td>
+                      <td>
+                        <span className={`status ${o.status}`}>
+                          <span />
+                          {o.status}
+                        </span>
+                      </td>
+                      <td className="numeric">{money(o.totalCents)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
-        <section className="assistant-card">
+        <aside className="assistant-card">
           <div className="assistant-symbol">
-            <Sparkles size={23} aria-hidden="true" />
+            <Bot size={24} />
           </div>
-          <span className="assistant-caption">Meet your analyst</span>
+          <span className="assistant-caption">
+            Meet your shopping companion
+          </span>
           <h2>
-            There’s a story
+            A good find
             <br />
-            in your numbers.
+            starts with Scout.
           </h2>
           <p>
-            Ask Ledger to find it. Explore trends, compare revenue, or get to
-            know your best customers.
+            Find the right headphones, build a better desk, or check on an
+            order. Just ask.
           </p>
-          <Link className="button" href="/chat">
-            Ask a question
-            <ArrowUpRight size={17} aria-hidden="true" />
+          <Link className="button" href="/agent">
+            Ask Scout <ArrowUpRight size={17} />
           </Link>
           <div className="assistant-example">
-            “Which products bring in the most revenue?”
+            “What would make my desk a little better?”
           </div>
-        </section>
+        </aside>
       </div>
-      <section className="panel">
-        <div className="panel-heading">
-          <div>
-            <h2>Recent orders</h2>
-            <p>The latest activity in your demo business</p>
-          </div>
-          <Link className="text-link" href="/orders">
-            View all orders
-            <ArrowUpRight size={15} aria-hidden="true" />
-          </Link>
-        </div>
-        <OrdersTable rows={result.recentOrders} />
+      <section className="shop-overview-note">
+        <span className="status-dot" />
+        <p>
+          Development shop. Orders are simulated, so you can explore without a
+          real purchase.
+        </p>
       </section>
-      <p className="data-footnote">
-        Synthetic dataset · Revenue excludes pending and cancelled orders · All
-        dates in UTC
-      </p>
     </>
   );
 }

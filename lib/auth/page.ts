@@ -10,7 +10,8 @@ export async function requireProPage() {
 }
 
 export async function requireAuthenticatedPage() {
- const config = requireAuthConfig(); const identity = await auth();
- if (!identity.userId) redirect("/sign-in");
- return enforceAuthenticated(identity, config.issuer);
+  const config = requireAuthConfig();
+  const identity = await auth();
+  if (!identity.userId) redirect("/sign-in");
+  return enforceAuthenticated(identity, config.issuer);
 }

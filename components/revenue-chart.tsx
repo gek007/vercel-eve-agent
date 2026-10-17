@@ -31,8 +31,16 @@ export function RevenueChart({
         >
           <defs>
             <linearGradient id="revenue-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7867df" stopOpacity=".22" />
-              <stop offset="100%" stopColor="#7867df" stopOpacity=".01" />
+              <stop
+                offset="0%"
+                stopColor="var(--chart-line, #507f72)"
+                stopOpacity=".22"
+              />
+              <stop
+                offset="100%"
+                stopColor="var(--chart-line, #507f72)"
+                stopOpacity=".01"
+              />
             </linearGradient>
           </defs>
           {[0, 0.25, 0.5, 0.75, 1].map((v) => (
@@ -42,7 +50,7 @@ export function RevenueChart({
               x2={w}
               y1={h * v}
               y2={h * v}
-              stroke="#ececf3"
+              stroke="var(--line)"
               strokeDasharray="4 5"
             />
           ))}
@@ -52,7 +60,7 @@ export function RevenueChart({
               <path
                 d={line}
                 fill="none"
-                stroke="#7867df"
+                stroke="var(--chart-line, #507f72)"
                 strokeWidth="3"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
@@ -64,7 +72,7 @@ export function RevenueChart({
                   cy={h - 18 - (g.revenueCents / max) * (h - 40)}
                   r="4"
                   fill="#fff"
-                  stroke="#7867df"
+                  stroke="var(--chart-line, #507f72)"
                   strokeWidth="2"
                 >
                   <title>{`${g.label}: ${money(g.revenueCents)}`}</title>

@@ -6,6 +6,8 @@ const envelopeSchema = z
     issuedAt: z.number().int().nonnegative(),
     operation: z.enum([
       "business",
+      "shopping.read",
+      "shopping.write",
       "session.claim",
       "session.assert",
       "session.list",

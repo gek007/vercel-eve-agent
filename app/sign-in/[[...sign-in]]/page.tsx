@@ -4,7 +4,7 @@ export default function SignInPage() {
   return (
     <main className="auth-page">
       <Link href="/" className="brand">
-        Ledger
+        Circuit & Co.
         <span className="brand-dot" />
       </Link>
       <SignIn />

@@ -13,9 +13,12 @@ type Identity = {
   userId: string | null;
   has: (check: { plan: string }) => boolean;
 } | null;
-export function enforceAuthenticated(identity: Identity, issuer: string): AuthenticatedCaller {
+export function enforceAuthenticated(
+  identity: Identity,
+  issuer: string,
+): AuthenticatedCaller {
   if (!identity?.userId) throw new AccessError(401, "Sign in to continue.");
-  return {userId: identity.userId, issuer};
+  return { userId: identity.userId, issuer };
 }
 export function enforcePro(identity: Identity, issuer: string): ProCaller {
   const caller = enforceAuthenticated(identity, issuer);
