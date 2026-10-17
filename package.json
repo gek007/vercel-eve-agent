@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed-demo.ts",
     "build:eve": "eve build",
-    "dev:db": "convex dev"
+    "dev:db": "convex dev",
+    "seed:shop": "tsx scripts/seed-shop.ts"
   },
   "dependencies": {
     "@clerk/backend": "3.25.0",

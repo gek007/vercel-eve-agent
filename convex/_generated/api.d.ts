@@ -12,6 +12,8 @@ import type * as business from "../business.js";
 import type * as conversations from "../conversations.js";
 import type * as http from "../http.js";
 import type * as seed from "../seed.js";
+import type * as shopSeed from "../shopSeed.js";
+import type * as shopping from "../shopping.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +26,8 @@ declare const fullApi: ApiFromModules<{
   conversations: typeof conversations;
   http: typeof http;
   seed: typeof seed;
+  shopSeed: typeof shopSeed;
+  shopping: typeof shopping;
 }>;
 
 /**
