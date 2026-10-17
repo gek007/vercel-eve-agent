@@ -113,6 +113,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
         <main id="main-content" className="content">
           {children}
+          <footer className="workspace-photo-credits">
+            <span>Product photos are illustrative.</span>
+            <Link href="/image-credits">Photo credits</Link>
+          </footer>
         </main>
       </div>
     </div>

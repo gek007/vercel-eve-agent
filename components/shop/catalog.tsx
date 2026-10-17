@@ -141,7 +141,7 @@ export function Catalog({ initial }: { initial: CatalogPage }) {
       <div className="product-grid" aria-busy={pending === "load"}>
         {data.rows.map((p) => (
           <article className="product-card" key={p.id}>
-            <ProductArt visual={p.visual} category={p.category} />
+            <ProductArt sku={p.sku} name={p.name} category={p.category} />
             <div className="product-copy">
               <span className="product-category">{p.category}</span>
               <h2>{p.name}</h2>

@@ -50,7 +50,11 @@ export default function Home() {
         </div>
         <div className="hero-product-scene">
           <div className="scene-main">
-            <ProductArt visual="headphones" category="Audio" />
+            <ProductArt
+              sku="CC-001"
+              name="Arc wireless headphones"
+              category="Audio"
+            />
             <span>Made for your everyday.</span>
           </div>
           <div className="scene-note">
@@ -80,7 +84,7 @@ export default function Home() {
             shopCatalog[33],
           ].map((p) => (
             <Link href="/shop" className="product-card" key={p.sku}>
-              <ProductArt visual={p.visual} category={p.category} />
+              <ProductArt sku={p.sku} name={p.name} category={p.category} />
               <div className="product-copy">
                 <span className="product-category">{p.category}</span>
                 <h2>{p.name}</h2>
@@ -120,6 +124,7 @@ export default function Home() {
           Circuit &amp; Co.
         </Link>
         <span>Helpful tech, thoughtfully picked.</span>
+        <Link href="/image-credits">Photo credits</Link>
         <Link href="/billing">Membership &amp; billing</Link>
       </footer>
     </main>

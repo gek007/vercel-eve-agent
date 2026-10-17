@@ -131,3 +131,12 @@ Tests cover cart persistence, checkout recovery after a lost response, Scout car
 updates, new conversations, and replay. See `docs/verification.md` for actual
 outcomes and limitations. Automated tests without real state explicitly skip
 provider-dependent browser journeys rather than simulating successful login.
+
+## Product photos
+
+All 40 catalog items have a representative local WebP photograph, shared by the
+shop, cart, and featured products. Content-hashed filenames prevent stale image
+caches, and Next.js serves responsive, lazy-loaded sizes. Image sources, creators,
+and available license details are listed at `/image-credits` and in
+`lib/shop/product-photos.json`. Images illustrate fictional demo products and may
+show other brands/models; source credits do not imply ownership or endorsement.

@@ -166,7 +166,8 @@ export function Cart({ initial }: { initial: CartResult }) {
             {cart.lines.map((l) => (
               <article className="cart-line" key={l.product.id}>
                 <ProductArt
-                  visual={l.product.visual}
+                  sku={l.product.sku}
+                  name={l.product.name}
                   category={l.product.category}
                 />
                 <div className="cart-line-copy">

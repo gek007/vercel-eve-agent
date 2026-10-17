@@ -1,38 +1,26 @@
-import {
-  Headphones,
-  Speaker,
-  Keyboard,
-  LampDesk,
-  BatteryCharging,
-  Backpack,
-  Laptop,
-  Mouse,
-} from "lucide-react";
-const icons = {
-  headphones: Headphones,
-  speaker: Speaker,
-  keyboard: Keyboard,
-  lamp: LampDesk,
-  charger: BatteryCharging,
-  bag: Backpack,
-  stand: Laptop,
-  mouse: Mouse,
-};
+import Image from "next/image";
+import photoPaths from "@/lib/shop/product-image-paths.json";
+
 export function ProductArt({
-  visual,
+  sku,
+  name,
   category,
 }: {
-  visual: string;
+  sku: string;
+  name: string;
   category?: string;
 }) {
-  const Icon = icons[visual as keyof typeof icons] ?? Laptop;
   return (
     <div
-      className={`product-art art-${category?.toLowerCase() ?? "desk"}`}
-      aria-hidden="true"
+      className={`product-art product-photo art-${category?.toLowerCase() ?? "desk"}`}
     >
-      <span className="product-art-base" />
-      <Icon strokeWidth={1.15} />
+      <Image
+        src={photoPaths[sku as keyof typeof photoPaths]}
+        alt={name}
+        fill
+        sizes="(max-width: 700px) 46vw, (max-width: 1200px) 30vw, 380px"
+        className="product-photo-image"
+      />
     </div>
   );
 }

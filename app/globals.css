@@ -2834,10 +2834,110 @@ tbody tr:hover {
 }
 
 /* Keep the product search full width before sort controls wrap on mobile. */
-.catalog-search { position: relative; }
-.catalog-search > svg { position: absolute; top: 13px; left: 14px; margin: 0; pointer-events: none; }
+.catalog-search {
+  position: relative;
+}
+.catalog-search > svg {
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  margin: 0;
+  pointer-events: none;
+}
 @media (max-width: 700px) {
- .catalog-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
- .catalog-search input { grid-column: 1 / -1; width: 100%; }
- .catalog-search select { width: 100%; min-width: 0; }
+  .catalog-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .catalog-search input {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .catalog-search select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Product photographs keep the same reserved space as the original artwork. */
+.product-photo {
+  background: #fff;
+}
+.product-photo-image {
+  object-fit: contain;
+  padding: 16px;
+}
+.cart-line .product-photo-image {
+  padding: 7px;
+}
+.scene-main .product-photo {
+  background: #fff;
+  border-radius: 20px;
+}
+.scene-main .product-photo-image {
+  padding: 15px;
+}
+.workspace-photo-credits {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 24px;
+}
+.workspace-photo-credits a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.photo-credits-page {
+  max-width: 1000px;
+  padding: 40px 24px 70px;
+  margin: auto;
+}
+.photo-credits-page > p {
+  max-width: 72ch;
+  color: var(--muted);
+  margin-top: 18px;
+  line-height: 1.8;
+}
+.photo-credit-list {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.photo-credit-list article {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  overflow-wrap: anywhere;
+}
+.photo-credit-list h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.photo-credit-list a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 13px;
+}
+.photo-credit-list p {
+  font-size: 12px;
+  margin-top: 8px;
+}
+.photo-credit-list small {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+@media (max-width: 700px) {
+  .product-photo-image {
+    padding: 10px;
+  }
+  .photo-credit-list {
+    grid-template-columns: 1fr;
+  }
 }
