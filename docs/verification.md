@@ -110,3 +110,11 @@ are ignored.
 Real browser checkout regressions also cover a stale second tab deleting another
 attempt's key and browser storage quota failure. Each failed before its fix and
 passed afterward. No additional reviewer pass was used.
+
+Final verification after fixes: 51/51 unit tests, all four real Pro browser tests,
+TypeScript, ESLint, and the final Next.js production build pass. The free-user
+shopping browser journey also passed separately. Standalone Eve build passed.
+The native final reviewer reported no Critical findings; both Important findings
+were fixed in commit `58507db`. The deferred minor and four scope rulings are
+listed above. Source is on `feat/shopping-app`; no public deployment or merge has
+been performed for the shopping conversion.
