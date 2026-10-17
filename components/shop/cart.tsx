@@ -18,6 +18,15 @@ import type {
 import { money } from "@/lib/format";
 import { ProductArt } from "./product-art";
 import { shopFetch, shopWrite, ShopRequestError } from "./http";
+// Tab-scoped storage preserves reload recovery without another tab erasing it.
+// Storage can be unavailable; the React retry state still protects same-tab retries.
+function clearPendingCheckout(key: string) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch {
+    /* In-memory state is authoritative for this tab. */
+  }
+}
 type PendingCheckout = Extract<ShopWrite, { operation: "checkout" }>;
 export function Cart({ initial }: { initial: CartResult }) {
   const { userId } = useAuth();
@@ -31,10 +40,10 @@ export function Cart({ initial }: { initial: CartResult }) {
     if (!userId) return;
     const timer = window.setTimeout(() => {
       try {
-        const saved = localStorage.getItem(key);
+        const saved = sessionStorage.getItem(key);
         if (saved) setRetry(JSON.parse(saved));
       } catch {
-        localStorage.removeItem(key);
+        clearPendingCheckout(key);
       }
     }, 0);
     return () => window.clearTimeout(timer);
@@ -66,20 +75,24 @@ export function Cart({ initial }: { initial: CartResult }) {
       revision: cart.revision,
       expectedTotalCents: cart.totalCents,
     };
-    localStorage.setItem(key, JSON.stringify(input));
+    try {
+      sessionStorage.setItem(key, JSON.stringify(input));
+    } catch {
+      /* Continue with the same request retained in React state. */
+    }
     setRetry(input);
     try {
       const result = await shopWrite(input);
       if (result.kind === "checkout") {
         setPlaced(result);
-        localStorage.removeItem(key);
+        clearPendingCheckout(key);
         setRetry(null);
         setCart(await shopFetch<CartResult>({ operation: "cart" }));
       }
     } catch (e) {
       setError((e as Error).message);
       if (e instanceof ShopRequestError && e.status < 500) {
-        localStorage.removeItem(key);
+        clearPendingCheckout(key);
         setRetry(null);
         setCart(await shopFetch<CartResult>({ operation: "cart" }));
       }

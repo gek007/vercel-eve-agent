@@ -84,5 +84,29 @@ URL: http://localhost:3001. This does not replace the old Vercel Ledger preview.
 - Clerk Pro description updated for Scout; price remains USD 20/month, B2C only,
   development/test payments. No real product checkout or fulfillment exists.
 
-Production build and independent final review results are appended after their
-commands finish. Browser states and generated test-user credentials are ignored.
+Next.js production build passed with all shopping routes compiled. Independent
+final review found no Critical issues and two Important client recovery issues.
+Both were reproduced with failing browser tests and fixed: cross-tab recovery
+keys are isolated in sessionStorage, and storage exceptions no longer leave
+checkout stuck. Both regression tests pass. Browser states and generated test-user credentials
+are ignored.
+
+
+### Review decisions and remaining limits
+
+- Catalog deletion recovery is not provided because no deletion workflow exists;
+  inactive-product checkout handling is tested. Future deletion needs a cart repair path.
+- Reads remain bounded to 200 catalog records and 1,000 personal orders for this
+  seeded demo. A larger deployment needs backend pagination to avoid truncated totals.
+- Checkout reviews aggregate expectedTotalCents. Offsetting unit-price changes
+  at the same total are not separately rejected; a stricter line-price review
+  contract would be needed if the catalog becomes a live commerce system.
+- Production deployment, payment processing, and fulfillment are excluded and
+  unverified; a production launch needs separate setup and verification.
+- Deferred minor: the HTTP GET catalog endpoint does not coerce maxPriceCents
+  from query text, so that optional HTTP filter returns 400. Scout's direct budget
+  search works; no browser budget input is exposed. Text/category/sort UI works.
+
+Real browser checkout regressions also cover a stale second tab deleting another
+attempt's key and browser storage quota failure. Each failed before its fix and
+passed afterward. No additional reviewer pass was used.

@@ -51,8 +51,9 @@ saves product/price snapshots, and clears the cart in one atomic mutation.
 
 Totals come from the server in integer USD cents. Quantities are bounded to 20
 per product and 40 distinct cart lines. Checkout validates the displayed cart
-revision and total; changed carts or prices require review. A retained checkout
+revision and total; changed carts or prices require review. A per-tab retained checkout
 key allows a lost response to be retried without creating a duplicate purchase.
+If browser storage is unavailable, the current tab retains the retry key in memory.
 New accounts start with an empty cart and no order history.
 
 Clerk membership checkout is separate and uses **development test payments**.
