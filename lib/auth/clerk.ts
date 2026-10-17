@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
-import { AccessError, enforcePro, requireAuthConfig } from "./policy";
-export async function requireProRequest(request: Request) {
+import { AccessError, enforceAuthenticated, enforcePro, requireAuthConfig } from "./policy";
+async function requestIdentity(request: Request) {
   const config = requireAuthConfig();
   const origin = request.headers.get("origin");
   if (origin && !config.trustedOrigins.includes(origin))
@@ -14,5 +14,14 @@ export async function requireProRequest(request: Request) {
     acceptsToken: "session_token",
   });
   const identity = state.toAuth();
-  return enforcePro(identity, config.issuer);
+  return {identity, issuer: config.issuer};
+}
+
+export async function requireAuthenticatedRequest(request: Request) {
+ const {identity, issuer} = await requestIdentity(request);
+ return enforceAuthenticated(identity, issuer);
+}
+export async function requireProRequest(request: Request) {
+ const {identity, issuer} = await requestIdentity(request);
+ return enforcePro(identity, issuer);
 }

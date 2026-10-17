@@ -1,4 +1,5 @@
-export type ProCaller = { userId: string; issuer: string };
+export type AuthenticatedCaller = { userId: string; issuer: string };
+export type ProCaller = AuthenticatedCaller;
 export class AccessError extends Error {
   constructor(
     public status: number,
@@ -12,11 +13,15 @@ type Identity = {
   userId: string | null;
   has: (check: { plan: string }) => boolean;
 } | null;
-export function enforcePro(identity: Identity, issuer: string): ProCaller {
+export function enforceAuthenticated(identity: Identity, issuer: string): AuthenticatedCaller {
   if (!identity?.userId) throw new AccessError(401, "Sign in to continue.");
-  if (!identity.has({ plan: "pro" }))
+  return {userId: identity.userId, issuer};
+}
+export function enforcePro(identity: Identity, issuer: string): ProCaller {
+  const caller = enforceAuthenticated(identity, issuer);
+  if (!identity!.has({ plan: "pro" }))
     throw new AccessError(403, "A Pro subscription is required.");
-  return { userId: identity.userId, issuer };
+  return caller;
 }
 export function requireAuthConfig(
   env: Record<string, string | undefined> = process.env,
