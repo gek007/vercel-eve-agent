@@ -4,6 +4,8 @@ A Next.js application with an Eve agent, private Convex demo datasets, and Clerk
 B2C subscriptions. Only signed-in individual users on the `pro` plan can access
 the dashboard, data explorers, agent tools, or conversations.
 
+[Open the verified development preview](https://vercel-eve-agent-76v2tjcte-gek007s-projects.vercel.app). Vercel team sign-in is required by preview protection.
+
 ## Current services
 
 - Clerk application: `vercel-eve-agent`, development billing, USD 20/month Pro.
@@ -78,7 +80,8 @@ keeps the same fixture keys and record counts. The dataset has:
 
 Two Clerk development users were created for checkout and isolation verification:
 `ledger+clerk_test@example.com` and `ledger-isolation+clerk_test@example.com`.
-Both have Pro test subscriptions; only the first is seeded. Test credentials are
+Both have Pro test subscriptions; only the first is seeded. The seeded demo account’s credentials are saved locally in `.env.demo-login`,
+which is ignored by Git and excluded from deployment. Test credentials are
 not committed. Use your own sign-in, or the authenticated Clerk CLI to manage
 these test accounts. Do not use them for production.
 

@@ -1,7 +1,7 @@
 # Pro business data assistant
 
 Date: 2026-10-17
-Status: Approved by the user on 2026-10-17; implementation plan pending review.
+Status: Implemented and verified as a development preview on 2026-10-17.
 
 ## Purpose and agreed scope
 
@@ -86,12 +86,12 @@ Keep a synthetic dataset per user, identified by a server-derived Clerk owner
 ID. This permits identical demo fixtures without exposing another user's data.
 Create the following records for a seeded demo user:
 
-| Collection | Approximate count | Principal fields |
-| --- | ---: | --- |
-| Customers | 250 | owner, fixture key, name, company, region, created date |
-| Products | 40 | owner, fixture key, name, category, price in cents |
-| Orders | 2,000 | owner, fixture key, customer, date, status, total in cents |
-| Order items | 6,000 | owner, fixture key, order, product, quantity, unit price |
+| Collection  | Approximate count | Principal fields                                           |
+| ----------- | ----------------: | ---------------------------------------------------------- |
+| Customers   |               250 | owner, fixture key, name, company, region, created date    |
+| Products    |                40 | owner, fixture key, name, category, price in cents         |
+| Orders      |             2,000 | owner, fixture key, customer, date, status, total in cents |
+| Order items |             6,000 | owner, fixture key, order, product, quantity, unit price   |
 
 Use integer cents and USD for the demo. Revenue means completed order totals;
 exclude pending and cancelled orders. Use UTC date boundaries in queries and
@@ -139,12 +139,12 @@ versions explicitly. Document environment variable names without secrets in an
 example file. Keep credentials in ignored local environment files and provider
 configuration. Never expose provider secret keys to the browser or model.
 
-The Vercel CLI previously reported an invalid token. Reauthentication through
-`vercel login` is required before deployment. Clerk CLI is authenticated but no
-application was linked at that time. Clerk B2C development billing has since been
-enabled on `vercel-eve-agent`; see `docs/clerk-billing-setup.md` for verified state.
-Convex deployment authentication/linking remains to be
-verified. These setup facts do not constitute verified deployment readiness.
+Clerk development B2C billing is configured on `vercel-eve-agent` with the Pro
+user plan at USD 20/month. Vercel and Convex CLI authentication are configured;
+the app uses the cloud Convex development deployment and a protected Vercel
+preview. OpenAI is connected directly using the user's supplied key. Production
+payments, production Clerk keys, and production data are separate setup.
+See `docs/clerk-billing-setup.md` and `docs/verification.md` for verified state.
 
 ## Acceptance and verification
 
