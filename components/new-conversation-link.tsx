@@ -11,7 +11,7 @@ export function NewConversationLink({
 }) {
   return (
     <Link
-      href="/chat"
+      href="/agent"
       className={className}
       aria-label={ariaLabel}
       prefetch={false}
@@ -20,7 +20,7 @@ export function NewConversationLink({
         // A document navigation guarantees a fresh store while retaining old history.
         event.preventDefault();
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Full navigation intentionally remounts Eve; client routing retains the old session.
-        window.location.assign("/chat");
+        window.location.assign("/agent");
       }}
     >
       {children}

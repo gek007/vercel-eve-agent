@@ -5,16 +5,18 @@ import { useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import {
   Sparkles,
+  Bot,
+  Plus,
   ArrowUp,
   Square,
   ArrowUpRight,
   MessageSquare,
 } from "lucide-react";
 const starters = [
-  "How much revenue did we earn in September?",
-  "Which five products generated the most revenue?",
-  "Who are our highest-spending customers?",
-  "Compare September revenue with August.",
+  "Which headphones would you recommend under $100?",
+  "Help me upgrade my desk for under $150.",
+  "What is in my cart right now?",
+  "Show me my recent orders.",
 ];
 export function AgentChat({ sessionId }: { sessionId?: string }) {
   const { getToken } = useAuth();
@@ -32,7 +34,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
       window.history.replaceState(
         null,
         "",
-        `/chat/${encodeURIComponent(agent.session.sessionId)}`,
+        `/agent/${encodeURIComponent(agent.session.sessionId)}`,
       );
   }, [agent.session?.sessionId]);
   useEffect(() => {
@@ -46,7 +48,29 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
   return (
     <div className="chat-workspace">
       <div className="chat-toolbar">
+        <div className="chat-identity">
+          <span className="chat-avatar">
+            <Bot size={22} aria-hidden="true" />
+          </span>
+          <div>
+            <div className="chat-title">
+              <strong>Scout</strong>
+              <span className="agent-state">
+                <span className="status-dot" />
+                {busy
+                  ? "Working"
+                  : agent.status === "resuming"
+                    ? "Restoring"
+                    : agent.error
+                      ? "Needs attention"
+                      : "Ready"}
+              </span>
+            </div>
+            <small>Your personal shopping companion</small>
+          </div>
+        </div>
         <NewConversationLink className="button secondary small">
+          <Plus size={16} aria-hidden="true" />
           New conversation
         </NewConversationLink>
       </div>
@@ -56,10 +80,10 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
             <div className="chat-orb">
               <Sparkles size={32} aria-hidden="true" />
             </div>
-            <h1>What would you like to understand?</h1>
+            <h1>What can I help you find?</h1>
             <p>
-              Your customers, orders, and revenue.
-              <br />A good question is all it takes.
+              Good products. Thoughtful recommendations.
+              <br />A little help for your everyday.
             </p>
             <div className="starter-grid">
               {starters.map((s) => (
@@ -87,7 +111,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
                 ) : (
                   <>
                     <Sparkles size={15} aria-hidden="true" />
-                    Ledger
+                    Scout
                   </>
                 )}
               </div>
@@ -98,7 +122,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
                   </div>
                 ) : part.type.includes("tool") ? (
                   <div className="tool-note" key={i}>
-                    Business data tool
+                    Shopping tool
                   </div>
                 ) : null,
               )}
@@ -108,7 +132,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
         {busy && (
           <div className="thinking">
             <Sparkles size={15} aria-hidden="true" />
-            Looking into your data…
+            Looking into that for you…
           </div>
         )}
         {agent.status === "resuming" && (
@@ -133,14 +157,14 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
         }}
       >
         <label htmlFor="message" className="sr-only">
-          Ask about your business
+          Ask Scout
         </label>
         <textarea
           id="message"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={8000}
-          placeholder="Ask about your business…"
+          placeholder="Ask Scout…"
           rows={2}
           onKeyDown={(e) => {
             if (
@@ -156,7 +180,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
         <div className="composer-bottom">
           <span>
             <Sparkles size={13} aria-hidden="true" />
-            Grounded in your demo data
+            Your personal shopping companion
           </span>
           {busy ? (
             <button
@@ -180,8 +204,7 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
         </div>
       </form>
       <p className="chat-disclaimer">
-        Ledger can make mistakes. Check important figures against your
-        dashboard.
+        Demo shop. Review your cart before placing an order.
       </p>
     </div>
   );
