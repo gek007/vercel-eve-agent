@@ -1773,3 +1773,6 @@ tbody tr:hover {
 
 .mobile-account { display:none; }
 @media(max-width:700px) { .mobile-account {display:inline-flex;} }
+
+.chat-toolbar { display: none; }
+@media(max-width:950px) { .chat-toolbar {display:flex;justify-content:flex-end;margin-bottom:8px;} }

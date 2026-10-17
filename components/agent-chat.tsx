@@ -1,4 +1,5 @@
 "use client";
+import { NewConversationLink } from "./new-conversation-link";
 import { useEveAgent } from "eve/react";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -44,6 +45,11 @@ export function AgentChat({ sessionId }: { sessionId?: string }) {
   };
   return (
     <div className="chat-workspace">
+      <div className="chat-toolbar">
+        <NewConversationLink className="button secondary small">
+          New conversation
+        </NewConversationLink>
+      </div>
       <div className="chat-transcript" aria-live="polite" aria-busy={busy}>
         {agent.data.messages.length === 0 ? (
           <div className="chat-welcome">

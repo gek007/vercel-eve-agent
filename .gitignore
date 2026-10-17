@@ -14,3 +14,6 @@ coverage/
 .convex/
 .eve/
 .vercel
+
+test-results/
+playwright-report/

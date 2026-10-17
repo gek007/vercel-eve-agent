@@ -17,7 +17,9 @@ export function allowedEveRoute(path: string) {
     path,
   );
 }
-export function guardEveRoute<T>(
+export function guardEveRoute<
+  T extends { params?: Readonly<Record<string, string>> },
+>(
   path: string,
   handler: (request: Request, args: T) => Response | Promise<Response>,
   deps: Dependencies,
@@ -26,9 +28,14 @@ export function guardEveRoute<T>(
     if (path === "/eve/v1/health") return handler(request, args);
     try {
       const caller = await deps.authenticate(request);
-      const url = new URL(request.url);
-      const match = url.pathname.match(/\/eve\/v1\/session\/([^/]+)(?:\/|$)/);
-      if (match) await deps.assertOwner(caller, decodeURIComponent(match[1]));
+      // The router canonicalizes encoded static path segments. Its matched
+      // params identify the session actually used by the downstream handler.
+      if (path.includes("/:sessionId")) {
+        const sessionId = args.params?.sessionId;
+        if (!sessionId)
+          throw new AccessError(400, "Missing session identifier.");
+        await deps.assertOwner(caller, sessionId);
+      }
       let title = "New conversation";
       if (request.method === "POST") {
         const raw = await request.clone().text();

@@ -20,7 +20,7 @@ describe("Eve session protection", () => {
         new Request("http://localhost/eve/v1/session/stolen" + suffix, {
           method: suffix === "/stream" ? "GET" : "POST",
         }),
-        {},
+        { params: { sessionId: "stolen" } },
       );
       expect(response.status).toBe(403);
       expect(inner).not.toHaveBeenCalled();
@@ -97,4 +97,37 @@ describe("Eve session protection", () => {
     expect(allowedEveRoute("/eve/v1/callback/:token")).toBe(false);
     expect(allowedEveRoute("/eve/v1/session/:sessionId/stubs")).toBe(false);
   });
+});
+it.each([
+  "/eve/v1/%73ession/victim/stream",
+  "/eve/%761/session/victim/stream",
+  "/eve/v1/%73ession/victim/cancel",
+])("uses router params for encoded route %s", async (url) => {
+  const deps = dependencies();
+  deps.assertOwner.mockRejectedValue(new AccessError(403, "Forbidden"));
+  const inner = vi.fn(async () => Response.json({ secret: "transcript" }));
+  const path = url.endsWith("/cancel")
+    ? "/eve/v1/session/:sessionId/cancel"
+    : "/eve/v1/session/:sessionId/stream";
+  const guarded = guardEveRoute(path, inner, deps);
+  const response = await guarded(
+    new Request("http://localhost" + url, {
+      method: url.endsWith("/cancel") ? "POST" : "GET",
+    }),
+    { params: { sessionId: "victim" } },
+  );
+  expect(response.status).toBe(403);
+  expect(deps.assertOwner).toHaveBeenCalledWith(caller, "victim");
+  expect(inner).not.toHaveBeenCalled();
+});
+it("fails closed if a matched session route has no router session ID", async () => {
+  const deps = dependencies();
+  const inner = vi.fn(async () => Response.json({ secret: "transcript" }));
+  const response = await guardEveRoute(
+    "/eve/v1/session/:sessionId/stream",
+    inner,
+    deps,
+  )(new Request("http://localhost/eve/v1/session/missing/stream"), {});
+  expect(response.status).toBe(400);
+  expect(inner).not.toHaveBeenCalled();
 });

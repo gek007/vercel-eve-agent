@@ -1,3 +1,4 @@
+import { NewConversationLink } from "@/components/new-conversation-link";
 import Link from "next/link";
 import { Plus, MessageSquare } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -34,18 +35,17 @@ export default async function Chat({
       <aside className="conversation-list">
         <div className="conversation-heading">
           <h2>Conversations</h2>
-          <Link
+          <NewConversationLink
             className="icon-button"
-            aria-label="New conversation"
-            href="/chat"
+            ariaLabel="New conversation"
           >
-            <Plus size={18} />
-          </Link>
+            <Plus size={18} aria-hidden="true" />
+          </NewConversationLink>
         </div>
-        <Link href="/chat" className="button secondary new-conversation">
+        <NewConversationLink className="button secondary new-conversation">
           <Plus size={16} aria-hidden="true" />
           New conversation
-        </Link>
+        </NewConversationLink>
         <nav aria-label="Conversations">
           {conversations.map((c) => (
             <Link

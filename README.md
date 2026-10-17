@@ -137,9 +137,11 @@ API denial, real Pro test checkout, dashboard/tables, session creation, and
 cross-user denial across all six session operations. Desktop and mobile screens
 were visually inspected.
 
-Model responses require a valid direct provider API key and are not verified
-until a successful tool-grounded answer has been observed. Compile/test success
-alone does not prove provider access. Provider errors appear as recoverable chat
+The direct OpenAI connection was verified with `gpt-5.4`. A live Eve chat called
+the revenue tool and answered $2,098,181.31 with 1,641 completed orders for
+January through September 2026; reloading restored the transcript. The browser
+regression also verifies that New conversation creates a distinct session.
+Compile/test success alone does not prove future provider availability. Provider errors appear as recoverable chat
 errors; no fabricated answer is returned.
 
 The demo queries deliberately read a bounded small dataset (up to 251 customers,
