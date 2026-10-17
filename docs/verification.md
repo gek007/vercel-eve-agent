@@ -58,3 +58,31 @@ Other implementation decisions:
 
 No production Clerk instance, payment activation, or production Convex dataset
 was configured. Preview deployment protection remains enabled.
+
+## Shopping conversion — 2026-10-17
+
+Implemented on `feat/shopping-app` in the attached worktree. Local verification
+URL: http://localhost:3001. This does not replace the old Vercel Ledger preview.
+
+- 51 Vitest tests pass (13 files), including new shopper access, catalog/order
+  seeding, ownership, cart receipts, atomic checkout/retry, stale revisions,
+  changed prices, inactive items, API validation, and Scout capabilities.
+- TypeScript, ESLint, and standalone Eve compilation pass.
+- Real Clerk Pro browser shopping test passes: add, quantity update, reload,
+  lost checkout response, retry, exactly one order, saved details, empty cart.
+- Real OpenAI Scout browser test passes: catalog lookup, explicitly requested
+  cart edit, database verification, fresh conversation, and persisted replay.
+- A newly created Clerk free test user can open Shop/Billing and access its cart
+  (200), cannot invoke Eve (403), and cannot read a Pro user's order (404).
+  Signed-out shopping API access returns 401; free Agent page redirects to pricing.
+- Development cloud seed run twice yields exactly 40 products and 24 historical
+  orders for the seeded account. Subsequent verification purchases add orders as
+  expected. Existing analytics records remain preserved.
+- Desktop and 390px mobile screenshots inspected for Shop, Cart, Orders,
+  Overview, Billing, and Agent. Shop/Cart/Agent have no page-level horizontal
+  overflow. All six mobile destinations remain reachable.
+- Clerk Pro description updated for Scout; price remains USD 20/month, B2C only,
+  development/test payments. No real product checkout or fulfillment exists.
+
+Production build and independent final review results are appended after their
+commands finish. Browser states and generated test-user credentials are ignored.

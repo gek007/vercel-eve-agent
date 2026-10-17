@@ -1,126 +1,110 @@
-# Ledger business assistant
+# Circuit & Co.
 
-A Next.js application with an Eve agent, private Convex demo datasets, and Clerk
-B2C subscriptions. Only signed-in individual users on the `pro` plan can access
-the dashboard, data explorers, agent tools, or conversations.
-
-[Open the verified development preview](https://vercel-eve-agent-76v2tjcte-gek007s-projects.vercel.app). Vercel team sign-in is required by preview protection.
-
-## Current services
-
-- Clerk application: `vercel-eve-agent`, development billing, USD 20/month Pro.
-- Convex project: `kostya-shilkrot/vercel-eve-agent`.
-- Convex development deployment: `adventurous-deer-280`.
-- Vercel project: `gek007s-projects/vercel-eve-agent`.
-- Provider: direct OpenAI or Anthropic API key, selected server-side.
-
-This is a development/test application. Clerk checkout uses its development
-payment gateway. Real payment-provider activation is outside this setup.
+A personal shopping demo built with Next.js, Convex, Clerk, and Vercel Eve.
+Scout is the Pro shopping companion, using your direct OpenAI API key.
 
 ## Run locally
 
-Use Node.js 24.x and npm. Provider SDK versions and dependencies are locked.
+Use Node.js 24.x and npm in the checkout containing this README:
 
 ```sh
 npm ci
-clerk link --app app_3KnYwZrfRDmhFDiDrJbe4xX983Y
-clerk env pull --instance dev --file .env.local
+npm run dev
 ```
 
-Copy the non-secret settings in `.env.example` into `.env.local`. Set
-`APP_URL=http://localhost:3000`,
-`CLERK_ISSUER_URL=https://great-chipmunk-9427.clerk.accounts.dev`, and
-`CONVEX_SITE_URL=https://adventurous-deer-280.convex.site` for the existing
-services. Generate a random `DATA_GATEWAY_SECRET` (at least 32 characters) for a
-new deployment and configure the same value on Convex and the app. Do not rotate
-the existing service secret without updating every connected app.
+Open http://localhost:3000. The development environment is already configured
+in the attached implementation worktree. The temporary verification server uses
+http://localhost:3001 with `APP_URL=http://localhost:3001`.
 
-Choose one direct model provider:
+For a new checkout, use `.env.example` and the installed Clerk CLI to link/pull
+keys. Configure `APP_URL` to exactly the browser origin, the Clerk issuer, the
+Convex HTTP actions URL (`CONVEX_SITE_URL`), and a shared `DATA_GATEWAY_SECRET` of
+at least 32 characters configured on both Convex and Next.js. Do not replace the
+existing secret without updating all connected applications. Keep keys server-side.
 
-- OpenAI: set `MODEL_PROVIDER=openai` and `OPENAI_API_KEY`.
-- Anthropic: set `MODEL_PROVIDER=anthropic` and `ANTHROPIC_API_KEY`.
+OpenAI uses `MODEL_PROVIDER=openai`, `OPENAI_API_KEY`, and optionally
+`OPENAI_MODEL` (verified with `gpt-5.4`). Anthropic can be explicitly selected with
+`MODEL_PROVIDER=anthropic` and its corresponding key/model variables. No provider
+secret is exposed to the browser or Scout. Eve starts alongside `next dev`.
 
-`OPENAI_MODEL` or `ANTHROPIC_MODEL` optionally overrides Eve's installed helper
-default. With no explicit provider selection, OpenAI is selected when its key
-exists, otherwise Anthropic. An explicitly selected provider never silently
-falls back to another provider or AI Gateway. The model context window is capped
-at 128,000 tokens for compaction; use models that support that context length.
-Keys are read at runtime, never placed in a browser bundle or model-visible
-principal attributes. No key is needed to compile or test access boundaries.
+## Shopping experience
+
+- **Overview:** your personal cart count, order count, simulated spending, and
+  recent orders.
+- **Shop:** 40 curated tech and desk essentials with category/search/sort controls.
+- **Cart:** private Convex persistence, quantity changes, removal, and totals.
+- **Orders:** your simulated purchases with immutable item/price snapshots.
+- **Billing:** individual Clerk Pro plan at **USD 20/month**, plus subscription
+  management through Clerk's profile modal.
+- **Agent:** Pro-only Scout chat, history, streaming, new conversations, and replay.
+
+Every workspace page requires sign-in. Free users can shop and place demo orders;
+Pro unlocks Scout. `/chat` redirects to `/agent`, including saved conversation URLs.
+Legacy analytics records and conversations remain stored; the Customers screen
+redirects to Overview. Old analytics tools are no longer exposed to the agent.
+
+### Simulated checkout
+
+Product checkout does **not** take a payment, fulfill goods, calculate tax, or
+arrange shipping. “Place demo order” creates a completed order in your account,
+saves product/price snapshots, and clears the cart in one atomic mutation.
+
+Totals come from the server in integer USD cents. Quantities are bounded to 20
+per product and 40 distinct cart lines. Checkout validates the displayed cart
+revision and total; changed carts or prices require review. A retained checkout
+key allows a lost response to be retried without creating a duplicate purchase.
+New accounts start with an empty cart and no order history.
+
+Clerk membership checkout is separate and uses **development test payments**.
+Production Clerk, payment activation, and a public shopping deployment are not
+part of this local implementation. The older Vercel preview still shows Ledger.
+
+### Scout
+
+Scout can search products and budgets, inspect your cart and orders, and update
+cart quantities after an explicit request. A recommendation alone does not add
+anything. Its five tools do not expose checkout, refunds, order cancellation,
+subscription changes, analytics queries, files, shell, or external services.
+Place orders through the Cart confirmation action. All product facts come from
+tools; unavailable services produce errors rather than invented results.
+
+## Convex development and demo data
+
+The existing development deployment is `adventurous-deer-280`. Push/watch database
+functions using the installed CLI:
 
 ```sh
-npm run dev
-# http://localhost:3000
+npm run dev:db
+# Or push once:
+npx convex dev --once
 ```
 
-`withEve()` starts Eve alongside Next.js. To edit/push database functions, run
-`npm run dev:db` in another terminal. Use the provider's test checkout through
-`/pricing` to give a development user the actual Pro plan; no local plan bypass
-exists. A newly subscribed user's demo dataset must be seeded using the CLI.
-
-## Seed a private dataset
-
-Find the development user's Clerk ID:
+Seed the shared catalog and 24 historical shopping orders for a verified demo
+user. Run from a configured checkout; production selections are refused:
 
 ```sh
 clerk users list --app app_3KnYwZrfRDmhFDiDrJbe4xX983Y --instance dev --query your-email --json
-npm run seed -- --deployment dev --user user_REPLACE_WITH_VERIFIED_USER_ID
-npx convex run seed:counts '{"ownerId":"user_REPLACE_WITH_VERIFIED_USER_ID"}' --deployment dev
+npm run seed:shop -- --deployment dev --user user_REPLACE_WITH_VERIFIED_USER_ID
+npx convex run shopSeed:counts '{"ownerId":"user_REPLACE_WITH_VERIFIED_USER_ID"}' --deployment dev
 ```
 
-The seed command refuses production selections. It invokes an internal action
-through the authenticated Convex CLI, in atomic resumable batches. Rerunning it
-keeps the same fixture keys and record counts. The dataset has:
+Seeding is atomic and idempotent. It does not modify the original analytics
+records. The existing demo login is saved in ignored `.env.demo-login` with local
+file permissions; passwords are never committed. It has a Pro test subscription.
+The original deterministic analytics seed remains available as `npm run seed`.
 
-- 250 customers, 40 products, 2,000 orders, 6,000 order items.
-- Dates from January 1 through September 30, 2026, interpreted in UTC.
-- USD amounts stored as integer cents.
-- Completed-order revenue of **209,818,131 cents ($2,098,181.31)**, 1,641 completed
-  orders. Pending/cancelled orders are excluded from revenue.
+## Trust boundaries
 
-Two Clerk development users were created for checkout and isolation verification:
-`ledger+clerk_test@example.com` and `ledger-isolation+clerk_test@example.com`.
-Both have Pro test subscriptions; only the first is seeded. The seeded demo account’s credentials are saved locally in `.env.demo-login`,
-which is ignored by Git and excluded from deployment. Test credentials are
-not committed. Use your own sign-in, or the authenticated Clerk CLI to manage
-these test accounts. Do not use them for production.
+Clerk verifies real session identity on every authenticated API call. Eve checks
+both login and `has({plan: 'pro'})` on each protected request, independently of
+Next.js page protection. Conversation IDs alone never authorize replay or controls;
+all session operations verify the owner, including encoded route forms.
 
-For a separate local Convex backend, follow `npx convex dev --help` and select a
-local deployment. Set the app's `CONVEX_SITE_URL` to that backend's HTTP actions
-URL and configure its secret separately.
-
-## Access model
-
-Next.js verifies Clerk sessions with `auth()` on protected pages and
-`authenticateRequest()` on APIs. Eve's channel independently verifies the same
-Clerk session and `has({ plan: 'pro' })`; Next.js middleware alone cannot protect
-its separate runtime. Trusted browser origins come from `APP_URL` and Vercel's
-own deployment/branch URL variables, never request headers.
-
-A Convex ownership registry binds each Eve session to its creator. All follow-up,
-stream/replay, and cancel/clear/compact/reset endpoints check ownership before
-calling Eve. Creation claims ownership before returning the session ID. Unknown
-sessions fail closed. Tools also verify the current caller matches the session
-initiator. Eve's own transcript is the only transcript store.
-
-Convex business functions are **internal**, not publicly callable queries. A
-fixed HTTP gateway verifies an HMAC-SHA256 signature over exact request bytes,
-including owner, operation, input, and timestamp. Only authenticated app/agent
-servers hold the signing secret. Envelopes expire within 60 seconds; operation
-and input allowlists reject additional ownership fields. Browsers and model
-arguments cannot select an owner. The gateway never exposes seed/reset/admin
-operations.
-
-Eve's optional default tools and agent delegation tool are disabled. The model
-has only four authored read-only business tools. Attachments, callbacks,
-identity forwarding, and tool stubs are not exposed. A just-bash virtual
-workspace satisfies Eve's required sandbox interface without native compute;
-no shell/file tools are available to the model.
-
-Clerk plan checks use its current session token. Subscription changes become
-visible after Clerk refreshes that token. New HTTP requests are rechecked; an
-already accepted turn may finish. The app does not mirror billing into a
-client-writable database flag.
+Shopping and analytics functions remain internal to Convex. A strict HMAC-signed,
+timestamp-bounded gateway carries server-derived identity and allowlisted operations.
+The browser/model cannot supply an owner or entitlement. Origin validation applies
+to shopping writes. Cart operations and checkout keys are owner-scoped; Scout uses
+its durable session/call ID to prevent duplicate cart increments after retries.
 
 ## Verification
 
@@ -132,42 +116,17 @@ npm run build
 npm run build:eve
 ```
 
-Tests cover Pro policy, signed gateway requests, date-range validation, fixture
-relationships, seed resumption/idempotency, revenue arithmetic, and session
-ownership routes. Convex tests use `convex-test`; actual CLI/cloud seed counts
-were also checked twice. Browser checks exercised signed-out redirects, free
-API denial, real Pro test checkout, dashboard/tables, session creation, and
-cross-user denial across all six session operations. Desktop and mobile screens
-were visually inspected.
-
-The direct OpenAI connection was verified with `gpt-5.4`. A live Eve chat called
-the revenue tool and answered $2,098,181.31 with 1,641 completed orders for
-January through September 2026; reloading restored the transcript. The browser
-regression also verifies that New conversation creates a distinct session.
-Compile/test success alone does not prove future provider availability. Provider errors appear as recoverable chat
-errors; no fabricated answer is returned.
-
-The demo queries deliberately read a bounded small dataset (up to 251 customers,
-41 products, 2,001 orders, 6,001 items per owner). This is not an import pipeline
-or a large-scale warehouse. Increase these limits or add aggregate tables before
-changing the fixture size.
-
-## Deploy a preview
-
-Use the installed Vercel CLI (64.5.0 or newer for this setup):
+Real browser tests require an explicitly supplied, ignored Playwright state file
+for a real Clerk Pro development user (no auth bypass). Point the URL at the
+configured local server:
 
 ```sh
-vercel link --yes --project vercel-eve-agent --scope gek007s-projects
-# Configure app env names from .env.example in Preview through vercel env add.
-# Mark CLERK_SECRET_KEY, DATA_GATEWAY_SECRET, and the provider API key sensitive.
-vercel deploy --target=preview --yes
+LEDGER_E2E_URL=http://localhost:3001 \
+LEDGER_E2E_STATE=.superpowers/shop-browser.json \
+npx playwright test --workers=1
 ```
 
-The first deployment of a new Vercel project is forced to production by Vercel,
-even with a preview target. This project's initial build was cancelled; later
-builds use Preview. Preview deployment protection remains enabled. Sign in to
-the Vercel team to access the preview, or verify it with `vercel curl`.
-
-Production Clerk keys, payment gateway activation, production Convex deployment,
-and a production domain are separate work. Do not reuse test keys or seed data
-as a production setup.
+Tests cover cart persistence, checkout recovery after a lost response, Scout cart
+updates, new conversations, and replay. See `docs/verification.md` for actual
+outcomes and limitations. Automated tests without real state explicitly skip
+provider-dependent browser journeys rather than simulating successful login.

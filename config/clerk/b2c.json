@@ -5,7 +5,7 @@
     "plans": {
       "pro": {
         "name": "Pro",
-        "description": "Access the business data assistant, dashboard, customers, orders, and revenue insights.",
+        "description": "Your personal Scout shopping companion for product recommendations, order help, and managing your cart.",
         "payer_type": "user",
         "amount": 2000,
         "currency": "usd",
